@@ -1,0 +1,36 @@
+#!/bin/bash
+
+function get_volume {
+    pamixer --get-volume
+}
+
+function is_mute {
+    pamixer --get-mute
+}
+
+function send_notification {
+    volume=`get_volume`
+    bar=$(seq -s "❚" $(($volume / 3)) | sed 's/[0-9]//g')
+    notify-send "                  $bar" 
+}
+
+case $1 in
+    up)
+	# Up the volume (+ 5%)
+	pamixer -i 5 > /dev/null
+	send_notification
+	;;
+    down)
+	pamixer -d 5 > /dev/null
+	send_notification
+	;;
+    mute)
+    	# Toggle mute
+	pamixer --toggle-mute > /dev/null
+	if is_mute ; then
+	    notify-send "Mute"
+	else
+	    send_notification
+	fi
+	;;
+esac
